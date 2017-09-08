@@ -4,9 +4,9 @@ module Construction.Internal.Types
   , Equation
   ) where
 
-import Data.Text (Text) -- we want to import only Text from Data.Text.
-import Data.Map  (Map (..))
-import Data.Set  (Set (..))
+import           Data.Map  (Map (..))
+import           Data.Set  (Set (..))
+import           Data.Text (Text)
 
 
 type Name = Text -- just alias, no more

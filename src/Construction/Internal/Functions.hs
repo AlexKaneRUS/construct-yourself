@@ -8,8 +8,12 @@
 module Construction.Internal.Functions
   ( Context (..)        -- make restrictions is good practice. As you can see here
   , fresh, free, bound  -- we make "public" not all functions, but only Context, fresh, ...
+<<<<<<< HEAD
   , reduce, substitute, alpha, beta, eta
   ) where
+=======
+  )where
+>>>>>>> first iteration
 
 import           Construction.Internal.Types (Name, Term (..))
 import           Data.Set                    (Set, delete, empty, insert,
@@ -40,6 +44,7 @@ bound Var{}   = empty
 bound App{..} = bound algo `union` bound arg
 bound Lam{..} = variable `insert` bound body
 
+<<<<<<< HEAD
 
 alpha :: Term -> Set Name -> Term
 alpha Lam{..} conflicts | hasConflict = let all_conflicts = conflicts `union` free body
@@ -94,3 +99,22 @@ reduce term = let term' = beta term
               in if term' == term
                  then eta term
                  else reduce term'
+=======
+-- a[n := b] - substiturion
+substitute :: Term -> Name -> Term -> Term
+substitute v@Var{..} n b | var == n  = b
+                         | otherwise = v
+substitute _ _ _ = undefined -- here you have to implement another 2 cases
+
+-- | alpha reduction
+alpha :: Term -> Set Name -> Term
+alpha = undefined
+
+-- | beta reduction
+beta :: Term -> Term
+beta = undefined
+
+-- | eta reduction
+eta :: Term -> Term
+eta = undefined
+>>>>>>> first iteration

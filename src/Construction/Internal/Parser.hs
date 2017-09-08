@@ -22,7 +22,8 @@ appP = try $ between (char '(') (char ')') $
            <*> termP
 
 bracketP :: Parser Term
-bracketP = undefined
+bracketP = between (char '(') (char ')') <*>
+           varP <|> appP <|> lamP
 
 lamP :: Parser Term
 lamP = undefined

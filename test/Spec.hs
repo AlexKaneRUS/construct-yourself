@@ -1,13 +1,21 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> first iteration
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
+<<<<<<< HEAD
 import           Construction (Name, Term (..), bound, free, fresh, alpha, beta, eta, reduce, substitute)
+=======
+import           Construction (Name, Term (..), bound, free, fresh)
+>>>>>>> first iteration
 import           Test.Hspec
 import Data.Set
 
 
+<<<<<<< HEAD
 main :: IO ()
 main = hspec $ do
     describe "Fresh test" testFresh
@@ -130,3 +138,15 @@ testEqual = do
 main :: IO ()
 main = putStrLn "Test suite not yet implemented"
 >>>>>>> initial
+=======
+main :: IO ()
+main = hspec $ 
+    describe "Fresh test" testFresh
+
+testFresh :: SpecWith ()
+testFresh = do
+    let conflicts = fromList ["a", "x", "x1"]
+    it "should generate fresh names" $ 
+        toList conflicts `shouldNotContain` [fresh conflicts]
+    
+>>>>>>> first iteration
