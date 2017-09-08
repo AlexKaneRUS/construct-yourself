@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -125,3 +126,7 @@ testEqual = do
     it "#2" $ reduce (App lamK lamId) `shouldBe` lamKK -- K I = K*
     let lamS = Lam "x" (Lam "y" (Lam "z" $ App (App (Var "x") (Var "z")) (App (Var "y") (Var "z"))))
     it "#3" $ reduce (App (App lamS lamK) lamK) `shouldBe` lamId -- S K K = I
+=======
+main :: IO ()
+main = putStrLn "Test suite not yet implemented"
+>>>>>>> initial
