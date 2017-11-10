@@ -1,21 +1,13 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> first iteration
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-<<<<<<< HEAD
-import           Construction (Name, Term (..), bound, free, fresh, alpha, beta, eta, reduce, substitute)
-=======
-import           Construction (Name, Term (..), bound, free, fresh)
->>>>>>> first iteration
+import           Construction (Name, Term (..), alpha, beta, bound, eta, free,
+                               fresh, reduce, substitute)
+import           Data.Set
 import           Test.Hspec
-import Data.Set
 
 
-<<<<<<< HEAD
 main :: IO ()
 main = hspec $ do
     describe "Fresh test" testFresh
@@ -46,7 +38,7 @@ appXX1 = App varX varX1 -- (x x1)
 testFresh :: SpecWith ()
 testFresh = do
     let conflicts = fromList ["a", "x", "x1"]
-    it "should test fresh function" $ 
+    it "should test fresh function" $
         toList conflicts `shouldNotContain` [fresh conflicts]
 
 testFree :: SpecWith ()
@@ -127,26 +119,10 @@ testReduce = do
     it "#4" $ reduce (App lamK varX) `shouldBe` Lam "x1" varX
     it "#5" $ reduce (App (App lamK varX) varX2) `shouldBe` varX
     it "#6" $ reduce (Lam "x0" (App (App (App lamK varX) varX2) varX0)) `shouldBe` varX
-      
+
 testEqual :: SpecWith ()
 testEqual = do
     it "#1" $ Lam "x" (Var "x") `shouldBe` Lam "y" (Var "y")
     it "#2" $ reduce (App lamK lamId) `shouldBe` lamKK -- K I = K*
     let lamS = Lam "x" (Lam "y" (Lam "z" $ App (App (Var "x") (Var "z")) (App (Var "y") (Var "z"))))
     it "#3" $ reduce (App (App lamS lamK) lamK) `shouldBe` lamId -- S K K = I
-=======
-main :: IO ()
-main = putStrLn "Test suite not yet implemented"
->>>>>>> initial
-=======
-main :: IO ()
-main = hspec $ 
-    describe "Fresh test" testFresh
-
-testFresh :: SpecWith ()
-testFresh = do
-    let conflicts = fromList ["a", "x", "x1"]
-    it "should generate fresh names" $ 
-        toList conflicts `shouldNotContain` [fresh conflicts]
-    
->>>>>>> first iteration

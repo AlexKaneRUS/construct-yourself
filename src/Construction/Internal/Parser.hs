@@ -1,6 +1,7 @@
-module Construction.Internal.Parser where
+module Construction.Internal.Parser (termP, varP, appP, bracketP, lamP, nameP) where
 
 import           Construction.Internal.Types (Term (..))
+import           Data.Text                   (pack)
 import           Data.Text                   (pack)
 import           Text.Parsec.Char            (char, digit, space)
 import           Text.Parsec.Combinator      (between, many1)
@@ -22,11 +23,12 @@ appP = try $ between (char '(') (char ')') $
            <*> termP
 
 bracketP :: Parser Term
-bracketP = between (char '(') (char ')') <*>
-           varP <|> appP <|> lamP
+bracketP = try $ between (char '(') (char ')') $
+           termP
 
 lamP :: Parser Term
-lamP = undefined
+lamP = (\x y -> Lam (pack x) y) <$> (char '\\' *> many space *> nameP <* many space <* char '.' <* many space)
+                                <*> termP
 
 nameP :: Parser String
 nameP = (:) <$> char 'x' <*> many digit

@@ -1,15 +1,22 @@
 module Construction.Internal.Types
-  ( Name, Term(..)
+  ( Equation
+  , Name, Term(..)
   , Type (..), Context (..), Substitution (..)
-  , Equation
   ) where
 
 import           Data.Map  (Map (..))
 import           Data.Set  (Set (..))
 import           Data.Text (Text)
 
-
 type Name = Text -- just alias, no more
+
+data Type
+  = VarType { varType  :: Name
+            }
+  | Arrow   { from :: Type
+            , to   :: Type
+            }
+            deriving (Show, Eq, Ord)
 
 data Term = Var { var :: Name }                     -- Variables: a, b, ...
           | App { algo :: Term, arg :: Term }       -- Application: M N
@@ -17,6 +24,8 @@ data Term = Var { var :: Name }                     -- Variables: a, b, ...
   deriving (Show) -- we deriving some common classes like Show.
                   -- With this deriving you can use function "show"
                   -- to print your term.
+
+type Equation = (Type, Type)
 
 data Type = TVar { tvar :: Name }                   -- Type variables: a, b, ...
           | TArr { from :: Type, to :: Type }       -- Arrow types: a -> b
