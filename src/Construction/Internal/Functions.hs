@@ -11,9 +11,7 @@ module Construction.Internal.Functions
   , reduce, substitute, alpha, beta, eta
   ) where
 
-import           Construction.Internal.Types (ContextElement (..), ContextT,
-                                              Name, Term (..), Type (..),
-                                              TypeEquation, TypeEquationSystem)
+import           Construction.Internal.Types (Name, Term (..))
 import           Control.Arrow               (second)
 import qualified Data.Map.Strict             as M
 import           Data.Set                    (Set, delete, empty, insert,
@@ -102,6 +100,20 @@ reduce term = let term' = beta term
               in if term' == term
                  then eta term
                  else reduce term'
+
+type ContextT = [ContextElement]
+type ContextElement = (Name, Type)
+
+data Type
+  = VarType { varType  :: Name
+            }
+  | Arrow   { from :: Type
+            , to   :: Type
+            }
+            deriving (Show, Eq, Ord)
+
+type TypeEquation = (Type, Type)
+type TypeEquationSystem = [TypeEquation]
 
 typeSub :: Type -> Name -> Type -> Type
 typeSub t@VarType{..} n nT = if varType == n then nT

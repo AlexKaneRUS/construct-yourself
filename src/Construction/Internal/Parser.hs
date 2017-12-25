@@ -11,16 +11,15 @@ import           Text.Parsec.Text            (Parser)
 
 
 termP :: Parser Term
-termP = varP <|> appP <|> lamP <|> bracketP
+termP = bracketP <|> appP <|> lamP <|> varP
 
 varP :: Parser Term
 varP =  (\x y -> Var $ pack (x:y)) <$> char 'x'
                                    <*> many digit
 
 appP :: Parser Term
-appP = try $ between (char '(') (char ')') $
-       App <$> (termP <* many1 space)
-           <*> termP
+appP = try (between (char '(') (char ')') (App <$> (termP <* many1 space) <*> termP)
+           <|> (App <$> (varP <* many1 space) <*> termP))
 
 bracketP :: Parser Term
 bracketP = try $ between (char '(') (char ')') $

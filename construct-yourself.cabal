@@ -21,7 +21,7 @@ library
   other-modules:       Construction.Internal.Types
                      , Construction.Internal.Functions
                      , Construction.Internal.Parser
-
+                     , Construction.Internal.TypeFunctions
                      , Tasks.GADT_1.GADTExpr
                      , Tasks.GADT_1.GADTParser
   build-depends:       base >= 4.7 && < 5

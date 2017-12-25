@@ -4,19 +4,11 @@ module Construction.Internal.Types
   , Type (..), Context (..), Substitution (..)
   ) where
 
-import           Data.Map  (Map (..))
+import           Data.Map  (Map (..), empty, keys, mapWithKey, union, (!))
 import           Data.Set  (Set (..))
 import           Data.Text (Text)
 
 type Name = Text -- just alias, no more
-
-data Type
-  = VarType { varType  :: Name
-            }
-  | Arrow   { from :: Type
-            , to   :: Type
-            }
-            deriving (Show, Eq, Ord)
 
 data Term = Var { var :: Name }                     -- Variables: a, b, ...
           | App { algo :: Term, arg :: Term }       -- Application: M N
@@ -24,8 +16,6 @@ data Term = Var { var :: Name }                     -- Variables: a, b, ...
   deriving (Show) -- we deriving some common classes like Show.
                   -- With this deriving you can use function "show"
                   -- to print your term.
-
-type Equation = (Type, Type)
 
 data Type = TVar { tvar :: Name }                   -- Type variables: a, b, ...
           | TArr { from :: Type, to :: Type }       -- Arrow types: a -> b
@@ -40,9 +30,9 @@ newtype Substitution = Substitution { getSubs :: Map Name Type } -- Substitute t
 type Equation = (Type, Type) -- Equation on types
 
 instance Monoid Context where
-  mempty = undefined
-  Context a `mappend` Context b = undefined
+  mempty = Context empty
+  Context a `mappend` Context b = Context (a `union` b)
 
 instance Monoid Substitution where
-  mempty = undefined
-  Substitution a `mappend` Substitution b = undefined
+  mempty = Substitution empty
+  Substitution a `mappend` Substitution b = Substitution (a `union` b)
