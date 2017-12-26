@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-
 module Construction.Internal.TypeFunctions where
 
 import           Construction.Internal.Functions hiding (Context, substitute)
@@ -13,7 +12,6 @@ import           Data.Set                        (Set (..), delete, elemAt,
                                                   insert, singleton, toList)
 import qualified Data.Set                        as S (fromList, map, union)
 import           Data.Text                       (pack)
-import           Debug.Trace                     (trace)
 
 -- Split a set of elements to the first element and rest set
 split :: Ord a => Set a -> (a, Set a)
@@ -27,27 +25,27 @@ ctx ! x | member x (getCtx ctx) = Just $ getCtx ctx M.! x
 
 -- Something we can perform substitution with
 class Substitutable a where
-  substitute :: Substitution -> a -> a
+  substituteT :: Substitution -> a -> a
 
 -- Substitution in context
 --   [a:=t]empty       => empty
 --   [a:=t]{x:t1 ... } => {x:([a:=t]t1) ... }
 instance Substitutable Context where
-  substitute sub (Context context) = Context (fmap (substitute sub) context)
+  substituteT sub (Context context) = Context (fmap (substituteT sub) context)
 
 -- Substitution in type:
 --   [a:=t] a     => t
 --   [a:=t] b     => b
 --   [a:=t](r->p) => ([a:=t]r)->([a:=t]p)
 instance Substitutable Type where
-  substitute (Substitution sub) t@(TVar name) = if name `elem` keys sub then (sub M.! name)
-                                                else t
-  substitute sub (TArr l r) = TArr (substitute sub l) (substitute sub r)
+  substituteT (Substitution sub) t@(TVar name) = if name `elem` keys sub then (sub M.! name)
+                                                 else t
+  substituteT sub (TArr l r) = TArr (substituteT sub l) (substituteT sub r)
 
 -- Compose two substitutions
 -- S@[a1 := t1, ...] . [b1 := s1 ...] = [b1 := S(s1) ... a1 := t1 ...]
 compose :: Substitution -> Substitution -> Substitution
-compose (Substitution b) sub@(Substitution a) = Substitution (fmap (substitute sub) b `M.union` a)
+compose (Substitution b) sub@(Substitution a) = Substitution (fmap (substituteT sub) b `M.union` a)
 
 -- Create new context from free variables of some term
 contextFromTerm :: Term -> Context
@@ -65,7 +63,7 @@ u set | null set  = pure mempty
                           if a == b then u rest
                           else do
                               let newSub = Substitution (fromList [(tvar, b)])
-                              let newSyst = S.map (\(x, y) -> (substitute newSub x, substitute newSub y)) rest
+                              let newSyst = S.map (\(x, y) -> (substituteT newSub x, substituteT newSub y)) rest
                               restSub <- u newSyst
                               pure (compose newSub restSub)
                       (a, b@TVar{}) -> u ((b, a) `insert` rest)
@@ -101,9 +99,9 @@ getTypeNames (TVar n)   = [n]
 getTypeNames (TArr l r) = getTypeNames l ++ getTypeNames r
 
 -- Find a principal pair of some term if exists
-pp :: Term -> Maybe (Context, Type)
+pp :: Term -> Maybe PrincipalPair
 pp term = do let ctx = contextFromTerm term
              let tpe = TVar "r"
              eqs <- e (getTypeNames tpe ++ keys (getCtx ctx)) ctx term tpe
              subs <- u eqs
-             trace (show ctx) (pure (substitute subs ctx, substitute subs tpe))
+             pure (PP (substituteT subs ctx, substituteT subs tpe))
