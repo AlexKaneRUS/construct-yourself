@@ -72,14 +72,17 @@ u set | null set  = pure mempty
 
 -- Generate equations set from some term
 -- NB: you can use @fresh@ function to generate type names
-e :: [Name] -> Context -> Term -> Type -> Maybe (Set Equation)
-e taken ctx term tpe = case term of
+e :: Context -> Term -> Type -> Maybe (Set Equation)
+e ctx term tpe = e' (getTypeNames tpe ++ keys (getCtx ctx)) ctx term tpe
+
+e' :: [Name] -> Context -> Term -> Type -> Maybe (Set Equation)
+e' taken ctx term tpe = case term of
                    Var{..} -> singleton . ((,) tpe) <$> ctx ! var
                    App{..} -> do
                        let freshN = fresh (S.fromList taken)
                        let freshNT = TVar freshN
-                       algoSet <- e (freshN : taken) ctx algo (TArr freshNT tpe)
-                       argSet <- e (nub (concatMap getEquationNames algoSet)) ctx arg freshNT
+                       algoSet <- e' (freshN : taken) ctx algo (TArr freshNT tpe)
+                       argSet <- e' (nub (concatMap getEquationNames algoSet)) ctx arg freshNT
                        pure (algoSet `S.union` argSet)
                    Lam{..} -> do
                      let freshN = fresh (S.fromList taken)
@@ -88,7 +91,7 @@ e taken ctx term tpe = case term of
                      let newTaken = freshN : taken
                      let freshN' = fresh (S.fromList newTaken)
                      let freshNT' = TVar freshN'
-                     resSet <- e (freshN' : newTaken) newCtx body freshNT'
+                     resSet <- e' (freshN' : newTaken) newCtx body freshNT'
                      pure ((tpe, TArr freshNT freshNT') `insert` resSet)
 
 getEquationNames :: Equation -> [Name]
@@ -102,6 +105,6 @@ getTypeNames (TArr l r) = getTypeNames l ++ getTypeNames r
 pp :: Term -> Maybe PrincipalPair
 pp term = do let ctx = contextFromTerm term
              let tpe = TVar "r"
-             eqs <- e (getTypeNames tpe ++ keys (getCtx ctx)) ctx term tpe
+             eqs <- e ctx term tpe
              subs <- u eqs
              pure (PP (substituteT subs ctx, substituteT subs tpe))

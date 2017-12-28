@@ -31,7 +31,8 @@ newtype Context = Context { getCtx :: Map Name Type } -- Types of variables
   deriving Eq
 
 instance Show Context where
-  show (Context context) = (tail . init) (concatMap (\(n, t) -> " " ++ unpack n ++ " : " ++ show t ++ ",") pairs)
+  show (Context context) = if null pairs then ""
+                           else (tail . init) (concatMap (\(n, t) -> " " ++ unpack n ++ " : " ++ show t ++ ",") pairs) ++ " "
     where
       pairs = toList context
 
@@ -51,4 +52,4 @@ instance Monoid Substitution where
 data PrincipalPair = PP (Context, Type)
 
 instance Show PrincipalPair where
-  show (PP (c, t)) = show c ++ " |- " ++ show t
+  show (PP (c, t)) = show c ++ "|- " ++ show t

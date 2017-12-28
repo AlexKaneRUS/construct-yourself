@@ -19,6 +19,7 @@ varP =  (\x y -> Var $ pack (x:y)) <$> char 'x'
 
 appP :: Parser Term
 appP = try (between (char '(') (char ')') (App <$> (termP <* many1 space) <*> termP)
+           <|> try ((\x y -> App (App x y)) <$> (varP <* many1 space) <*> varP <*> (many1 space *> termP))
            <|> (App <$> (varP <* many1 space) <*> termP))
 
 bracketP :: Parser Term
